@@ -5,7 +5,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.max;
 
+import java.awt.Image;
 import java.util.List;
+
+import javax.swing.ImageIcon;
 
 import board.Square;
 import cardsAndDecks.Card;
@@ -18,9 +21,10 @@ public class Hero {
 
 	private boolean isBuilt = false;
 
-	private String shortName = null;
-	private String longName = null;
-	private String title = null;
+	private final String shortName;
+	private final String longName;
+	private final String title;
+	private final Image heroImage;
 
 	private List<Card> inventory = Lists.newArrayList();
 
@@ -38,6 +42,10 @@ public class Hero {
 		this.shortName = shortName;
 		this.longName = longName;
 		this.title = title;
+		this.heroImage = new ImageIcon(getClass().getResource(
+				"/resources/heroes/" + shortName.trim().toLowerCase() + ".png"))
+				.getImage();
+
 		isBuilt = false;
 	}
 
@@ -82,6 +90,10 @@ public class Hero {
 	public String getTitle() {
 		checkState(isBuilt);
 		return title;
+	}
+
+	public Image getHeroImage() {
+		return heroImage;
 	}
 
 	public int getMaxHp() {

@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import hero.Hero;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,6 +24,7 @@ public class Square extends JLabel {
 	private static final long serialVersionUID = 2886677788368889113L;
 
 	public static final int SQUARE_EDGE = 71;
+	public static final int HERO_INDENT = 12;
 
 	private Tile tile = null;
 	private Hero hero = null;
@@ -61,106 +61,33 @@ public class Square extends JLabel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (getTile() != null) {
-			// {
-			// Graphics2D g1 = (Graphics2D) g.create();
-			// g1.setColor(Color.DARK_GRAY);
-			// g1.drawRect(0, 0, SQUARE_EDGE, SQUARE_EDGE);
-			// g1.dispose();
-			// }
-
-			{
-				Graphics2D g2 = (Graphics2D) g.create();
-				switch (tile.getEntryDirection()) {
-				case EAST:
-					g2.rotate(Math.toRadians(90), SQUARE_EDGE / 2,
-							SQUARE_EDGE / 2);
-					break;
-				case WEST:
-					g2.rotate(Math.toRadians(-90), SQUARE_EDGE / 2,
-							SQUARE_EDGE / 2);
-					break;
-				case SOUTH:
-					g2.rotate(Math.toRadians(180), SQUARE_EDGE / 2,
-							SQUARE_EDGE / 2);
-					break;
-				case NORTH:
-					break;
-				}
-				g2.drawImage(tile.getCardImage(), 0, 0, SQUARE_EDGE,
-						SQUARE_EDGE, null);
-				g2.dispose();
+			Graphics2D gTile = (Graphics2D) g.create();
+			switch (getTile().getEntryDirection()) {
+			case EAST:
+				gTile.rotate(Math.toRadians(90), SQUARE_EDGE / 2,
+						SQUARE_EDGE / 2);
+				break;
+			case WEST:
+				gTile.rotate(Math.toRadians(-90), SQUARE_EDGE / 2,
+						SQUARE_EDGE / 2);
+				break;
+			case SOUTH:
+				gTile.rotate(Math.toRadians(180), SQUARE_EDGE / 2,
+						SQUARE_EDGE / 2);
+				break;
+			case NORTH:
+				break;
 			}
-			{
-				Graphics2D g4 = (Graphics2D) g.create();
-				if (getTile() != null) {
-					g4.setColor(Color.RED);
-					switch (tile.getSideFacingDirection(Direction.NORTH)) {
-					case DOOR:
-						g4.drawString("nDD", 35, 8);
-						break;
-					case WALL:
-						g4.drawString("nWW", 35, 8);
-						break;
-					case PORTCULLIS:
-						g4.drawString("nPP", 35, 8);
-						break;
-					case OPENING:
-						g4.drawString("n--", 35, 8);
-						break;
-					}
-					switch (tile.getSideFacingDirection(Direction.SOUTH)) {
-					case DOOR:
-						g4.drawString("sDD", 35, 63);
-						break;
-					case WALL:
-						g4.drawString("sWW", 35, 63);
-						break;
-					case PORTCULLIS:
-						g4.drawString("sPP", 35, 63);
-						break;
-					case OPENING:
-						g4.drawString("s--", 35, 63);
-						break;
-					}
-					switch (tile.getSideFacingDirection(Direction.EAST)) {
-					case DOOR:
-						g4.drawString("eDD", 55, 35);
-						break;
-					case WALL:
-						g4.drawString("eWW", 55, 35);
-						break;
-					case PORTCULLIS:
-						g4.drawString("ePP", 55, 35);
-						break;
-					case OPENING:
-						g4.drawString("e--", 55, 35);
-						break;
-					}
-					switch (tile.getSideFacingDirection(Direction.WEST)) {
-					case DOOR:
-						g4.drawString("wDD", 8, 35);
-						break;
-					case WALL:
-						g4.drawString("wWW", 8, 35);
-						break;
-					case PORTCULLIS:
-						g4.drawString("wPP", 8, 35);
-						break;
-					case OPENING:
-						g4.drawString("w--", 8, 35);
-						break;
-					}
-				}
-				g4.dispose();
-			}
+			gTile.drawImage(getTile().getCardImage(), 0, 0, SQUARE_EDGE,
+					SQUARE_EDGE, null);
+			gTile.dispose();
 		}
-		{
-			Graphics2D g3 = (Graphics2D) g.create();
-			if (getHero() != null) {
-				g3.setColor(Color.YELLOW);
-				g3.drawString(getHero().getShortName(), 25, 25);
-			}
-			g3.dispose();
+		if (getHero() != null) {
+			Graphics2D gHero = (Graphics2D) g.create();
+			gHero.drawImage(getHero().getHeroImage(), HERO_INDENT, HERO_INDENT,
+					SQUARE_EDGE - 2 * HERO_INDENT, SQUARE_EDGE - 2
+							* HERO_INDENT, null);
+			gHero.dispose();
 		}
 	}
 

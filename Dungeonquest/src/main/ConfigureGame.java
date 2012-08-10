@@ -36,7 +36,7 @@ public class ConfigureGame extends SwingWorker<Void, Void> {
 		bob.setCurrentPlayer(true);
 		bob.setTurnIncrementingPlayer(true);
 
-		bob.setHero(Hero.named("Xil", "Xilliam", "The Gnasher").setStrenght(6)
+		bob.setHero(Hero.named("Adoran", "Adoran", "The Gnasher").setStrenght(6)
 				.setArmour(5).setLuck(7).setMaxHp(12).build());
 		// tom.setHero(Hero.named("Yak", "Yakum", "The Grinder").setStrenght(6)
 		// .setArmour(5).setLuck(7).setMaxHp(12).build());
