@@ -4,13 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import hero.Hero;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 
 import board.Board.Direction;
 import cardsAndDecks.Tile;
@@ -19,11 +13,8 @@ import cardsAndDecks.TilePile;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
-public class Square extends JLabel {
+public class Square {
 
-	private static final long serialVersionUID = 2886677788368889113L;
-
-	public static final int SQUARE_EDGE = 71;
 	public static final int HERO_INDENT = 12;
 
 	private Tile tile = null;
@@ -50,46 +41,41 @@ public class Square extends JLabel {
 		super();
 		checkNotNull(reference);
 		this.reference = reference;
-		setSize(SQUARE_EDGE, SQUARE_EDGE);
-		setPreferredSize(new Dimension(SQUARE_EDGE, SQUARE_EDGE));
-		setMinimumSize(new Dimension(SQUARE_EDGE, SQUARE_EDGE));
-		setMaximumSize(new Dimension(SQUARE_EDGE, SQUARE_EDGE));
-		setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 	}
 
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		if (getTile() != null) {
-			Graphics2D gTile = (Graphics2D) g.create();
-			switch (getTile().getEntryDirection()) {
-			case EAST:
-				gTile.rotate(Math.toRadians(90), SQUARE_EDGE / 2,
-						SQUARE_EDGE / 2);
-				break;
-			case WEST:
-				gTile.rotate(Math.toRadians(-90), SQUARE_EDGE / 2,
-						SQUARE_EDGE / 2);
-				break;
-			case SOUTH:
-				gTile.rotate(Math.toRadians(180), SQUARE_EDGE / 2,
-						SQUARE_EDGE / 2);
-				break;
-			case NORTH:
-				break;
-			}
-			gTile.drawImage(getTile().getCardImage(), 0, 0, SQUARE_EDGE,
-					SQUARE_EDGE, null);
-			gTile.dispose();
-		}
-		if (getHero() != null) {
-			Graphics2D gHero = (Graphics2D) g.create();
-			gHero.drawImage(getHero().getHeroImage(), HERO_INDENT, HERO_INDENT,
-					SQUARE_EDGE - 2 * HERO_INDENT, SQUARE_EDGE - 2
-							* HERO_INDENT, null);
-			gHero.dispose();
-		}
-	}
+//	@Override
+//	protected void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		if (getTile() != null) {
+//			Graphics2D gTile = (Graphics2D) g.create();
+//			switch (getTile().getEntryDirection()) {
+//			case EAST:
+//				gTile.rotate(Math.toRadians(90), SQUARE_EDGE / 2,
+//						SQUARE_EDGE / 2);
+//				break;
+//			case WEST:
+//				gTile.rotate(Math.toRadians(-90), SQUARE_EDGE / 2,
+//						SQUARE_EDGE / 2);
+//				break;
+//			case SOUTH:
+//				gTile.rotate(Math.toRadians(180), SQUARE_EDGE / 2,
+//						SQUARE_EDGE / 2);
+//				break;
+//			case NORTH:
+//				break;
+//			}
+//			gTile.drawImage(getTile().getCardImage(), 0, 0, SQUARE_EDGE,
+//					SQUARE_EDGE, null);
+//			gTile.dispose();
+//		}
+//		if (getHero() != null) {
+//			Graphics2D gHero = (Graphics2D) g.create();
+//			gHero.drawImage(getHero().getHeroImage(), HERO_INDENT, HERO_INDENT,
+//					SQUARE_EDGE - 2 * HERO_INDENT, SQUARE_EDGE - 2
+//							* HERO_INDENT, null);
+//			gHero.dispose();
+//		}
+//	}
 
 	public Hero getHero() {
 		return hero;
@@ -97,7 +83,6 @@ public class Square extends JLabel {
 
 	public void setHero(Hero hero) {
 		this.hero = hero;
-		this.repaint();
 	}
 
 	public Reference getReference() {

@@ -1,22 +1,64 @@
 package board;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import com.google.common.collect.Maps;
 
-public class Board extends JPanel {
+public class Board extends JPanel implements MouseListener, MouseWheelListener,
+		MouseMotionListener, Observer {
+
+	public class Zoomer extends Observable {
+
+		private boolean enabled = false;
+		private float zoomLevel = 1.0f;
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public float getZoomLevel() {
+			return zoomLevel;
+		}
+
+		public void adjustZoomLevel(float zoomMovement) {
+			if (isEnabled()) {
+				float oldZoomLevel = zoomLevel;
+				this.zoomLevel = max(min(this.zoomLevel + zoomMovement, 3.0f),
+						1.0f);
+				if (oldZoomLevel != zoomLevel) {
+					setChanged();
+				}
+				notifyObservers();
+			}
+		}
+
+	}
+
+	private final Zoomer zoomer = new Zoomer();
 
 	public enum Direction {
 		NORTH, SOUTH, EAST, WEST;
@@ -49,16 +91,74 @@ public class Board extends JPanel {
 	public static final int NUM_ROWS = MAX_ROW - MIN_ROW + 1;
 	public static final int NUM_COLS = MAX_COL - MIN_COL + 1;
 
-	private final static int ON_SCREEN_WIDTH = 1024;
+	private final int VIEW_WINDOW_WIDTH = 1024;
 
-	private final int onScreenHeight;
+	private final int VIEW_WINDOW_HEIGHT;
+
+	private int gameBoardWidth = 0;
+	private int gameBoardHeight = 0;
 
 	private Image gameBoardImage = null;
+	private int gameBoardStartX = 0;
+	private int gameBoardStartY = 0;
+	private int gameBoardUnscaledCentreX = 0;
+	private int gameBoardUnscaledCentreY = 0;
+
+	public static final int SQUARE_EDGE = 71;
 
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(gameBoardImage, 0, 0, ON_SCREEN_WIDTH, onScreenHeight, null);
+		g.drawImage(gameBoardImage, 0, 0, VIEW_WINDOW_WIDTH,
+				VIEW_WINDOW_HEIGHT, gameBoardStartX, gameBoardStartY,
+				gameBoardStartX + gameBoardWidth, gameBoardStartY
+						+ gameBoardHeight, null);
+		if (!board.values().isEmpty()) {
+			final int zoomedSquareEdge = (int) (SQUARE_EDGE * zoomer
+					.getZoomLevel());
+			for (Square square : board.values()) {
+				if (square.getTile() != null) {
+					final int adjustedX = (int) (((square.getReference()
+							.getCol() - 1) * SQUARE_EDGE + 50) * zoomer
+								.getZoomLevel()) - (int) (gameBoardStartX / zoomer
+										.getZoomLevel());
+					final int adjustedY = (int) (((square.getReference()
+							.getRow() - 1) * SQUARE_EDGE + 50) * zoomer
+								.getZoomLevel());
+
+					System.out.println("zl " + zoomer.getZoomLevel());
+					System.out.println("gameBoardStartX " + gameBoardStartX);
+					System.out.println("adjustedX " + adjustedX);
+					System.out.println("gameBoardStartY " + gameBoardStartY);
+					System.out.println("adjustedY " + adjustedY);
+
+					Graphics2D gTile = (Graphics2D) g.create();
+					// switch (square.getTile().getEntryDirection()) {
+					// case EAST:
+					// gTile.rotate(Math.toRadians(90), SQUARE_EDGE / 2,
+					// SQUARE_EDGE / 2);
+					// break;
+					// case WEST:
+					// gTile.rotate(Math.toRadians(-90), SQUARE_EDGE / 2,
+					// SQUARE_EDGE / 2);
+					// break;
+					// case SOUTH:
+					// gTile.rotate(Math.toRadians(180), SQUARE_EDGE / 2,
+					// SQUARE_EDGE / 2);
+					// break;
+					// case NORTH:
+					// break;
+					// }
+					g.drawImage(square.getTile().getCardImage(), adjustedX,
+							adjustedY, adjustedX + zoomedSquareEdge, adjustedY
+									+ zoomedSquareEdge, 0, 0, square.getTile()
+									.getCardImage().getWidth(null), square
+									.getTile().getCardImage().getHeight(null),
+							null);
+					gTile.dispose();
+				}
+			}
+		}
 	}
 
 	private static final long serialVersionUID = 7122598008306748396L;
@@ -97,36 +197,16 @@ public class Board extends JPanel {
 		this.gameBoardImage = new ImageIcon(getClass().getResource(
 				"/resources/gameboard.png")).getImage();
 
-		onScreenHeight = (int) ((float) ON_SCREEN_WIDTH
+		VIEW_WINDOW_HEIGHT = (int) ((float) VIEW_WINDOW_WIDTH
 				/ gameBoardImage.getWidth(null) * gameBoardImage
 				.getHeight(null));
-		setPreferredSize(new Dimension(ON_SCREEN_WIDTH, onScreenHeight));
+		setPreferredSize(new Dimension(VIEW_WINDOW_WIDTH, VIEW_WINDOW_HEIGHT));
 		setBorder(BorderFactory.createLineBorder(Color.black));
-
-		GridLayout gridLayout = new GridLayout(NUM_ROWS, NUM_COLS);
-		JPanel tileSquares = new JPanel();
-		tileSquares.setOpaque(false);
-		tileSquares.setLayout(gridLayout);
-		tileSquares.setPreferredSize(new Dimension(NUM_COLS
-				* Square.SQUARE_EDGE, NUM_ROWS * Square.SQUARE_EDGE));
-		tileSquares.setMaximumSize(new Dimension(NUM_COLS * Square.SQUARE_EDGE,
-				NUM_ROWS * Square.SQUARE_EDGE));
-		tileSquares.setMinimumSize(new Dimension(NUM_COLS * Square.SQUARE_EDGE,
-				NUM_ROWS * Square.SQUARE_EDGE));
-
-		GroupLayout groupLayout = new GroupLayout(this);
-		setLayout(groupLayout);
-
-		groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-				.addGap(50).addComponent(tileSquares));
-		groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
-				.addGap(50).addComponent(tileSquares));
 
 		for (int r = 1; r <= NUM_ROWS; r++) {
 			for (int c = 1; c <= NUM_COLS; c++) {
 				final Reference loc = Reference.at(r, c);
 				board.put(loc, new Square(loc));
-				tileSquares.add(board.get(loc));
 			}
 		}
 
@@ -138,6 +218,19 @@ public class Board extends JPanel {
 			}
 		}
 
+		gameBoardWidth = gameBoardImage.getWidth(null);
+		gameBoardHeight = gameBoardImage.getHeight(null);
+
+		gameBoardUnscaledCentreX = gameBoardWidth / 3;
+		gameBoardUnscaledCentreY = gameBoardHeight / 3;
+
+		mapCoordinates();
+
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addMouseWheelListener(this);
+
+		zoomer.addObserver(this);
 	}
 
 	private static Board instance = null;
@@ -153,6 +246,10 @@ public class Board extends JPanel {
 
 	}
 
+	public Zoomer getZoomer() {
+		return zoomer;
+	}
+
 	public Square getSquare(int row, int col) {
 		return getSquare(Reference.at(row, col));
 	}
@@ -163,6 +260,73 @@ public class Board extends JPanel {
 			board.put(location, new Square(location));
 		}
 		return board.get(location);
+	}
+
+	private void mapCoordinates() {
+		gameBoardWidth = (int) (gameBoardImage.getWidth(null) * (1.0 / zoomer
+				.getZoomLevel()));
+		gameBoardHeight = (int) (gameBoardImage.getHeight(null) * (1.0 / zoomer
+				.getZoomLevel()));
+
+		gameBoardStartX = max(gameBoardUnscaledCentreX - gameBoardWidth / 2, 0);
+		gameBoardStartY = max(gameBoardUnscaledCentreY - gameBoardHeight / 2, 0);
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		gameBoardUnscaledCentreX = (int) (gameBoardImage.getWidth(null) * ((1.0f * e
+				.getX()) / (1.0f * VIEW_WINDOW_WIDTH)));
+		gameBoardUnscaledCentreY = (int) (gameBoardImage.getHeight(null) * ((1.0f * e
+				.getY()) / (1.0f * VIEW_WINDOW_HEIGHT)));
+
+		zoomer.adjustZoomLevel(-0.1f * e.getWheelRotation());
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		mapCoordinates();
+		repaint();
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		System.out.println("drag button " + e.getButton());
+		System.out.println("drag x " + e.getX());
+		System.out.println("drag y " + e.getY());
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		System.out.println("click button " + e.getButton());
+		if (e.getButton() == 2) {
+
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		System.out.println("press button " + e.getButton());
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		zoomer.setEnabled(true);
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		zoomer.setEnabled(false);
 	}
 
 }

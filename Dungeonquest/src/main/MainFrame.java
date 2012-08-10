@@ -101,6 +101,8 @@ public class MainFrame extends JFrame {
 			nextSquare.setTile(direction.getOpposite());
 		}
 
+		Board.get().repaint();
+		
 		clientFactory.getEventBus().post(new TurnEnds());
 	}
 
@@ -251,80 +253,78 @@ public class MainFrame extends JFrame {
 													.get()) != Side.WALL));
 
 			moveSouthAction
-			.setEnabled(activePlayer.getHero().getSquare()
-					.getPassage(Direction.SOUTH).isPresent()
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.SOUTH)
-							.get()
-							.getSide(
-									activePlayer.getHero().getSquare()
-											.getReference()) != Side.WALL)
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.SOUTH)
-							.get()
-							.getSide(
-									activePlayer
-											.getHero()
-											.getSquare()
-											.getReference()
-											.getAdjacent(
-													Direction.SOUTH)
-											.get()) != Side.WALL));
+					.setEnabled(activePlayer.getHero().getSquare()
+							.getPassage(Direction.SOUTH).isPresent()
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.SOUTH)
+									.get()
+									.getSide(
+											activePlayer.getHero().getSquare()
+													.getReference()) != Side.WALL)
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.SOUTH)
+									.get()
+									.getSide(
+											activePlayer
+													.getHero()
+													.getSquare()
+													.getReference()
+													.getAdjacent(
+															Direction.SOUTH)
+													.get()) != Side.WALL));
 
 			moveEastAction
-			.setEnabled(activePlayer.getHero().getSquare()
-					.getPassage(Direction.EAST).isPresent()
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.EAST)
-							.get()
-							.getSide(
-									activePlayer.getHero().getSquare()
-											.getReference()) != Side.WALL)
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.EAST)
-							.get()
-							.getSide(
-									activePlayer
-											.getHero()
-											.getSquare()
-											.getReference()
-											.getAdjacent(
-													Direction.EAST)
-											.get()) != Side.WALL));
-			
+					.setEnabled(activePlayer.getHero().getSquare()
+							.getPassage(Direction.EAST).isPresent()
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.EAST)
+									.get()
+									.getSide(
+											activePlayer.getHero().getSquare()
+													.getReference()) != Side.WALL)
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.EAST)
+									.get()
+									.getSide(
+											activePlayer
+													.getHero()
+													.getSquare()
+													.getReference()
+													.getAdjacent(Direction.EAST)
+													.get()) != Side.WALL));
+
 			moveWestAction
-			.setEnabled(activePlayer.getHero().getSquare()
-					.getPassage(Direction.WEST).isPresent()
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.WEST)
-							.get()
-							.getSide(
-									activePlayer.getHero().getSquare()
-											.getReference()) != Side.WALL)
-					&& (activePlayer
-							.getHero()
-							.getSquare()
-							.getPassage(Direction.WEST)
-							.get()
-							.getSide(
-									activePlayer
-											.getHero()
-											.getSquare()
-											.getReference()
-											.getAdjacent(
-													Direction.WEST)
-											.get()) != Side.WALL));
-			
+					.setEnabled(activePlayer.getHero().getSquare()
+							.getPassage(Direction.WEST).isPresent()
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.WEST)
+									.get()
+									.getSide(
+											activePlayer.getHero().getSquare()
+													.getReference()) != Side.WALL)
+							&& (activePlayer
+									.getHero()
+									.getSquare()
+									.getPassage(Direction.WEST)
+									.get()
+									.getSide(
+											activePlayer
+													.getHero()
+													.getSquare()
+													.getReference()
+													.getAdjacent(Direction.WEST)
+													.get()) != Side.WALL));
+
 		}
 	}
 
