@@ -39,6 +39,8 @@ public class Tile extends AbstractCard {
 
 	public Tile(String name, Image cardImage, CardType cardFunction) {
 		super(name, cardImage, TilePile.get(), cardFunction);
+		
+		entryDirection = Direction.NORTH;
 
 		entrySide = extractSide(name, 3);
 		leftOfEntrySide = extractSide(name, 4);
@@ -76,8 +78,6 @@ public class Tile extends AbstractCard {
 	}
 
 	public void setEntryDirection(Direction entryDirection) {
-		this.entryDirection = entryDirection;
-
 		int turnsClockwise = 0;
 
 		switch (this.entryDirection) {
@@ -132,6 +132,8 @@ public class Tile extends AbstractCard {
 		}
 
 		checkState(turnsClockwise <= 3);
+
+		this.entryDirection = entryDirection;
 
 		Side tempSide = null;
 		switch (turnsClockwise) {
